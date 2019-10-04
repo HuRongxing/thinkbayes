@@ -908,11 +908,37 @@ def MakePmfFromCdf(cdf, name=None):
 
 
 # ## 类Joint$\to$Pmf
+def MakeMixture(metapmf, name='mix'):
+    """Make a mixture distribution.
 
-# In[9]:
+    Args:
+      metapmf: Pmf that maps from Pmfs to probs.
+      name: string name for the new Pmf.
 
+    Returns: Pmf object.
+    """
+    mix = Pmf(name=name)
+    print('******')
+    for pmf, p1 in metapmf.Items():
+        if np.isnan(p1): p1=0
+        for x, p2 in pmf.Items():
+            if np.isnan(p2): p2=0
+            mix.Incr(x, p1 * p2)            
+    return mix
 
+def MakePmfFromItems(t, name=''):
+    """Makes a PMF from a sequence of value-probability pairs
 
+    Args:
+        t: sequence of value-probability pairs
+        name: string name for this PMF
+
+    Returns:
+        Pmf object
+    """
+    pmf = Pmf(dict(t), name)
+    pmf.Normalize()
+    return pmf
 
 class Joint(Pmf):
     """联合分布.
