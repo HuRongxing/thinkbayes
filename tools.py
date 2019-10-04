@@ -1065,6 +1065,74 @@ class Hist(_DictWrapper):
 
 
 
+class Beta(object):
+    """Represents a Beta distribution.
+
+    See http://en.wikipedia.org/wiki/Beta_distribution
+    """
+    def __init__(self, alpha=1, beta=1, name=''):
+        """Initializes a Beta distribution."""
+        self.alpha = alpha
+        self.beta = beta
+        self.name = name
+
+    def Update(self, data):
+        """Updates a Beta distribution.
+
+        data: pair of int (heads, tails)
+        """
+        heads, tails = data
+        self.alpha += heads
+        self.beta += tails
+
+    def Mean(self):
+        """Computes the mean of this distribution."""
+        return float(self.alpha) / (self.alpha + self.beta)
+
+    def Random(self):
+        """Generates a random variate from this distribution."""
+        return random.betavariate(self.alpha, self.beta)
+
+    def Sample(self, n):
+        """Generates a random sample from this distribution.
+
+        n: int sample size
+        """
+        size = n,
+        return numpy.random.beta(self.alpha, self.beta, size)
+
+    def EvalPdf(self, x):
+        """Evaluates the PDF at x."""
+        return x ** (self.alpha - 1) * (1 - x) ** (self.beta - 1)
+
+    def MakePmf(self, steps=101, name=''):
+        """Returns a Pmf of this distribution.
+
+        Note: Normally, we just evaluate the PDF at a sequence
+        of points and treat the probability density as a probability
+        mass.
+
+        But if alpha or beta is less than one, we have to be
+        more careful because the PDF goes to infinity at x=0
+        and x=1.  In that case we evaluate the CDF and compute
+        differences.
+        """
+        if self.alpha < 1 or self.beta < 1:
+            cdf = self.MakeCdf()
+            pmf = cdf.MakePmf()
+            return pmf
+
+        xs = [i / (steps - 1.0) for i in xrange(steps)]
+        probs = [self.EvalPdf(x) for x in xs]
+        pmf = MakePmfFromDict(dict(zip(xs, probs)), name)
+        return pmf
+
+    def MakeCdf(self, steps=101):
+        """Returns the CDF of this distribution."""
+        xs = [i / (steps - 1.0) for i in xrange(steps)]
+        ps = [scipy.special.betainc(self.alpha, self.beta, x) for x in xs]
+        cdf = Cdf(xs, ps)
+        return cdf
 
 
 
