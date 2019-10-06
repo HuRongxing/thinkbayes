@@ -1122,14 +1122,14 @@ class Beta(object):
             pmf = cdf.MakePmf()
             return pmf
 
-        xs = [i / (steps - 1.0) for i in xrange(steps)]
+        xs = [i / (steps - 1.0) for i in range(steps)]
         probs = [self.EvalPdf(x) for x in xs]
         pmf = MakePmfFromDict(dict(zip(xs, probs)), name)
         return pmf
 
     def MakeCdf(self, steps=101):
         """Returns the CDF of this distribution."""
-        xs = [i / (steps - 1.0) for i in xrange(steps)]
+        xs = [i / (steps - 1.0) for i in range(steps)]
         ps = [scipy.special.betainc(self.alpha, self.beta, x) for x in xs]
         cdf = Cdf(xs, ps)
         return cdf
@@ -1202,6 +1202,20 @@ class Paintball(Suite, Joint):
         pmf = MakeLocationPmf(alpha, beta, self.locations)
         like = pmf.Prob(x)
         return like
+    
+def MakePmfFromDict(d, name=''):
+    """Makes a PMF from a map from values to probabilities.
+
+    Args:
+        d: dictionary that maps values to probabilities
+        name: string name for this PMF
+
+    Returns:
+        Pmf object
+    """
+    pmf = Pmf(d, name)
+    pmf.Normalize()
+    return pmf
 
 
 # ## 函数
