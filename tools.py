@@ -1218,6 +1218,16 @@ def MakePmfFromDict(d, name=''):
     return pmf
 
 
+def BinomialCoef(n, k):
+    """Compute the binomial coefficient "n choose k".
+
+    n: number of trials
+    k: number of successes
+
+    Returns: float
+    """
+    return scipy.special.comb(n, k)
+
 # ## 函数
 
 # In[12]:
